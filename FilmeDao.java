@@ -15,9 +15,9 @@ public interface FilmeDao {
     @Query("SELECT * FROM filme WHERE title IN (:title)")
     List<WrapperModel.FilmesModel.Result> findByTitle(String title);
 
-    @Query("SELECT * FROM filme WHERE first_name LIKE :first AND "
+    /*@Query("SELECT * FROM filme WHERE first_name LIKE :first AND "
             + "last_name LIKE :last LIMIT 1")
-    WrapperModel.FilmesModel.Result findByName(String first, String last);
+    WrapperModel.FilmesModel.Result findByName(String first, String last);*/
 
     @Insert
     void insertAll(WrapperModel.FilmesModel.Result... filme);

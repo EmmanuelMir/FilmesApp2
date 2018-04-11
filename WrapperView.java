@@ -1,6 +1,7 @@
 package com.emmanuelmir.filmesapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,20 +12,20 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import org.springframework.http.converter.StringHttpMessageConverter;
+import org.greenrobot.eventbus.EventBus;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.Serializable;
+
+
 
 
 /**
@@ -48,7 +49,6 @@ public class WrapperView extends AppCompatActivity {
     private ProgressBar mPbar;                  //ProgressBar para ser usada na AsyncTask.
     private EditText mFilmesEdt;                //EditText para pesquisa do filme pelo título
     private CharSequence mCharTitulo;           //Parâmetros para serem usados futuramente na implementação RxJava.
-    private AlertDialog.Builder mDialogBuilder; //Builder do Dialog.
     private AlertDialog mDialog;                //Dialog para ajudar na verificação do toque das views da RecyclerView*
     private InputMethodManager imm;             //Para controle futuro sobre o virtual keyboard
     private EditText mSearchEdit;
@@ -83,15 +83,15 @@ public class WrapperView extends AppCompatActivity {
 
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
-
+        startBuscaFilmesAsync(1);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Buscando filme " + mCharTitulo.toString(), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                startBuscaFilmesAsync(1);
+                startBuscaView();
 
             }
         });
@@ -114,19 +114,25 @@ public class WrapperView extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.refresh_movies) {
             if(mFilmesTask!=null) {
-
+                stopBuscaFilmesAsync();
             }
             startBuscaFilmesAsync(1);
             return true;
+
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     public class HttpRequestTask extends AsyncTask<Integer, Void, WrapperModel.FilmesModel> {
 
         @Override
         protected void onPreExecute() {
-            startAsyncAnimation();
+            showProgressBar();
             super.onPreExecute();
         }
 
@@ -136,15 +142,12 @@ public class WrapperView extends AppCompatActivity {
         @Override
         protected WrapperModel.FilmesModel doInBackground(Integer... params) {
             try {
-                final String url = "https://api.themoviedb.org/3/authentication/token/new?api_key=";
-                final String urlBaseSession = "https://api.themoviedb.org/3/authentication/session/new?api_key=";
+                //final String url = "https://api.themoviedb.org/3/authentication/token/new?api_key=";                  //Link de request do token de uma nova sessão
+                //final String urlBaseSession = "https://api.themoviedb.org/3/authentication/session/new?api_key=";     //Link de autenticação da sessão
                 final String urlMovies = "https://api.themoviedb.org/3/movie/now_playing?api_key=";
                 String urlAux;
-                WrapperModel.FilmesModel mFilmesAux;
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                //WrapperModel.APIKeyModel apiKeyModel;
-                //apiKeyModel = restTemplate.getForObject(urlAux, WrapperModel.APIKeyModel.class);
                 WrapperModel.FilmesModel mFilmes;
                 urlAux = urlMovies+ mApiKeyChave.getApi_key()+"&page="+(params[0]);
                 mFilmes = restTemplate.getForObject(urlAux, WrapperModel.FilmesModel.class);
@@ -159,14 +162,14 @@ public class WrapperView extends AppCompatActivity {
         @Override
         protected void onPostExecute(WrapperModel.FilmesModel mFilmesModel) {
             //showApiKeyData();
-            stopAsyncAnimation();
+            hideProgressBar();
             if (mFilmesModel != null) {
-                dialogShow("teste", "" + mFilmesModel.getResults());
+                //dialogShow("teste", "" + mFilmesModel.getResults());
                 mWrapperController.setmFilmeData(mFilmesModel);
             }
             else {
                 try {
-                    dialogShow("teste", "Nulo! \n " + mApiKeyChave.getApi_key());
+                    dialogShow("Aviso!", "Alguma coisa deu errado!");
                 }catch (NullPointerException e){
                     e.printStackTrace();
                 }
@@ -179,7 +182,7 @@ public class WrapperView extends AppCompatActivity {
 
 
     public void dialogShow(String titulo, String message){
-        mDialogBuilder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
+        AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
         mDialogBuilder.setTitle(titulo);
         mDialogBuilder.setMessage(message);
         mDialogBuilder.setPositiveButton("OK", null);
@@ -191,12 +194,12 @@ public class WrapperView extends AppCompatActivity {
         mDialog.cancel();
     }
 
-    public void startAsyncAnimation(){
+    public void showProgressBar(){
         mRecyclerView.setVisibility(View.INVISIBLE);
         mPbar.setVisibility(View.VISIBLE);
     }
 
-    public void stopAsyncAnimation(){
+    public void hideProgressBar(){
         mRecyclerView.setVisibility(View.VISIBLE);
         mPbar.setVisibility(View.INVISIBLE);
     }
@@ -207,7 +210,7 @@ public class WrapperView extends AppCompatActivity {
 
     public void stopBuscaFilmesAsync(){
         if(mFilmesTask!=null) {
-            stopAsyncAnimation();
+            hideProgressBar();
             mFilmesTask.cancel(true);
         }
     }
@@ -216,5 +219,13 @@ public class WrapperView extends AppCompatActivity {
     protected void onDestroy() {
         stopBuscaFilmesAsync();
         super.onDestroy();
+    }
+
+    public void startBuscaView(){
+        WrapperModel.FilmesModel myFilmesExtra = mWrapperController.getmFilmeData();
+        BusGlobal.getBus().postSticky(myFilmesExtra);
+        Intent mInt = new Intent(WrapperView.this, BuscaView.class);
+        mInt.putExtra("title", mCharTitulo);
+        WrapperView.this.startActivity(mInt);
     }
 }

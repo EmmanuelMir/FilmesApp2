@@ -20,13 +20,12 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 public class WrapperController extends RecyclerView.Adapter<WrapperController.FilmeControllerViewHolder> {
-    //TODO 04 CRIAR atributos necessários da classe ??
     private WrapperModel.FilmesModel mFilmeData;
-    private ArrayList<WrapperModel.FilmesModel.Result> mFilmeFiltered = new ArrayList<>();
+    private List<WrapperModel.FilmesModel.Result> mFilmeFiltered = new ArrayList<>();
+    private List<WrapperModel.FilmesModel.Result> mFilmeFilteredResults = new ArrayList<>();
     private WrapperModel.APIKeyModel mApiKeyModel;
     private WrapperModel.ApiKeyChave  mApiKey = new WrapperModel.ApiKeyChave();
-    //TODO 05 Extend da RecyclerView class DONE
-    //TODO 06 Override e Implementation necessários da RecyclerView. DONE
+    private CharSequence tituloFiltro;
 
     public class FilmeControllerViewHolder extends RecyclerView.ViewHolder{
         public final TextView mTitulo;
@@ -54,9 +53,17 @@ public class WrapperController extends RecyclerView.Adapter<WrapperController.Fi
         final int positionData = position; //Tem que ser definido aqui para que seja guardado como o endereço da holder.
         if (position == getItemCount()-1) {
             // load more data here.
-            WrapperView mA = (WrapperView) holder.itemView.getContext();
-            mA.startBuscaFilmesAsync(mFilmeData.getPage()+1);
+            Class c = holder.itemView.getContext().getClass();
+            if(c == WrapperView.class) {
+                WrapperView mA = (WrapperView) holder.itemView.getContext();
+                mA.startBuscaFilmesAsync(mFilmeData.getPage() + 1);
+            }
+            if(c == BuscaView.class){
+                BuscaView mB =(BuscaView) holder.itemView.getContext();
+                mB.startBuscaFilmesAsync(mFilmeData.getPage() + 1);
+            }
         }
+
         String filmeTitulo = mFilmeData.getResults().get(position).getTitle();
         holder.mTitulo.setText(filmeTitulo);
     }
@@ -72,31 +79,31 @@ public class WrapperController extends RecyclerView.Adapter<WrapperController.Fi
     }
 
     public void publishResults(CharSequence charTitulo) {
-        performFiltering(charTitulo);
+        tituloFiltro = charTitulo;
+        mFilmeData.setResults(performFiltering(tituloFiltro));
+        notifyDataSetChanged();
     }
 
-    protected WrapperModel.FilmesModel performFiltering(CharSequence charTitulo) {
+    protected List<WrapperModel.FilmesModel.Result> performFiltering(CharSequence charTitulo) {
 
         String stringTitulo = charTitulo.toString().toLowerCase();
 
         if (stringTitulo.isEmpty()){
-            return mFilmeData;
+            return mFilmeData.getResults();
         } else {
             if(!mFilmeFiltered.isEmpty())mFilmeFiltered.clear();
             for (int i = 0; i< mFilmeData.getResults().size(); i++) {
 
                 // name match condition. this might differ depending on your requirement
                 // here we are looking for name or phone number match
-                if(mFilmeData.getResults().get(i).getTitle().contains(stringTitulo)&&!stringTitulo.equals("")){
+                if(mFilmeData.getResults().get(i).getTitle().toLowerCase().contains(stringTitulo)&&!stringTitulo.equals("")){
                     mFilmeFiltered.add(mFilmeData.getResults().get(i));
                 }
             }
 
 
         }
-
-        mFilmeData.setResults(mFilmeFiltered);
-        return mFilmeData;
+        return mFilmeFiltered;
 
     }
 
@@ -113,6 +120,9 @@ public class WrapperController extends RecyclerView.Adapter<WrapperController.Fi
             mFilmeData.getResults().addAll(filmesModel.getResults());
         }
         notifyDataSetChanged();
+    }
+    public WrapperModel.FilmesModel getmFilmeData(){
+        return mFilmeData;
     }
 
     public interface TMDbApi {
