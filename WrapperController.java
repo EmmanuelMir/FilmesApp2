@@ -53,14 +53,19 @@ public class WrapperController extends RecyclerView.Adapter<WrapperController.Fi
         final int positionData = position; //Tem que ser definido aqui para que seja guardado como o endereço da holder.
         if (position == getItemCount()-1) {
             // load more data here.
+            int i = mFilmeData.getPage() +1;
             Class c = holder.itemView.getContext().getClass();
-            if(c == WrapperView.class) {
+            if(c == WrapperView.class&&(mFilmeData.getPage()+1)<mFilmeData.getTotalPages()) {
                 WrapperView mA = (WrapperView) holder.itemView.getContext();
-                mA.startBuscaFilmesAsync(mFilmeData.getPage() + 1);
+                mA.startBuscaFilmesAsync(i);
+                mA.dialogShow("Página", ""+ i +"\nPáginas Totais: "+ mFilmeData.getTotalPages());
+                mFilmeData.setPage(i);
             }
-            if(c == BuscaView.class){
+            if(c == BuscaView.class&&(mFilmeData.getPage()+1)<mFilmeData.getTotalPages()){
                 BuscaView mB =(BuscaView) holder.itemView.getContext();
-                mB.startBuscaFilmesAsync(mFilmeData.getPage() + 1);
+                mB.startBuscaFilmesAsync2(i);
+                mB.dialogShow("Página", ""+ i +"\nPáginas Totais: "+ mFilmeData.getTotalPages());
+                mFilmeData.setPage(i);
             }
         }
 

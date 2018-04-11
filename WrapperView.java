@@ -89,8 +89,7 @@ public class WrapperView extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Buscando filme " + mCharTitulo.toString(), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //Snackbar.make(view, "Buscando filme " + mCharTitulo.toString(), Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 startBuscaView();
 
             }
