@@ -9,16 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
 
 public class WrapperController extends RecyclerView.Adapter<WrapperController.FilmeControllerViewHolder> {
     private WrapperModel.FilmesModel mFilmeData;
@@ -208,17 +202,6 @@ public class WrapperController extends RecyclerView.Adapter<WrapperController.Fi
         return mFilmeData;
     }
 
-    public interface TMDbApi {
-
-        @GET("/movie/now_playing?api_key={api_key}")
-        Call filmesEmCartaz(@Path("api_key") String api_key);
-
-        /*@GET("/authentication/session/new?{api_key}&{request_token}")
-        Call listRepoContributors(
-                @Path("api_key") String api_key,
-                @Path("request_token") String request_token);
-        */
-    }
 
     /**
      * Interface do Click Handler e classes necessárias

@@ -9,19 +9,19 @@ import java.util.List;
 
 @Dao
 public interface FilmeDao {
-    @Query("SELECT * FROM filme")
+    @Query("SELECT * FROM result")
     List<WrapperModel.FilmesModel.Result> getAll();
 
-    @Query("SELECT * FROM filme WHERE title IN (:title)")
+    @Query("SELECT * FROM result WHERE title IN (:title)")
     List<WrapperModel.FilmesModel.Result> findByTitle(String title);
 
-    /*@Query("SELECT * FROM filme WHERE first_name LIKE :first AND "
-            + "last_name LIKE :last LIMIT 1")
-    WrapperModel.FilmesModel.Result findByName(String first, String last);*/
+    @Query("SELECT * FROM result WHERE title LIKE :title AND "
+            + "vote_average LIKE :voteAverage LIMIT 1")
+    WrapperModel.FilmesModel.Result findByName(String title, float voteAverage );
 
     @Insert
-    void insertAll(WrapperModel.FilmesModel.Result... filme);
+    void insertAll(WrapperModel.FilmesModel.Result... results);
 
     @Delete
-    void delete(WrapperModel.FilmesModel.Result filme);
+    void delete(WrapperModel.FilmesModel.Result result);
 }

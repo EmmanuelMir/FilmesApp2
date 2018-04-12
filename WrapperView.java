@@ -53,6 +53,7 @@ public class WrapperView extends AppCompatActivity implements WrapperController.
     private EditText mSearchEdit;
     private HttpRequestTask mFilmesTask;
     private WrapperModel.ApiKeyChave mApiKeyChave = new WrapperModel.ApiKeyChave();
+    private static final String TAG = WrapperView.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,7 @@ public class WrapperView extends AppCompatActivity implements WrapperController.
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
+
 
         mRecyclerView = findViewById(R.id.my_recycler);
 
@@ -217,9 +219,13 @@ public class WrapperView extends AppCompatActivity implements WrapperController.
         }
     }
 
+    /**
+     * Para a Async de busca de filmes caso haja alguma rodando e destrói a instância do RoomDb
+     */
     @Override
     protected void onDestroy() {
         stopBuscaFilmesAsync();
+        RoomDb.destroyInstance();
         super.onDestroy();
     }
 
@@ -245,6 +251,12 @@ public class WrapperView extends AppCompatActivity implements WrapperController.
         BusGlobal.getBus().postSticky(filmeDetails);
         Intent mInt = new Intent(WrapperView.this, DetailsView.class);
         WrapperView.this.startActivity(mInt);
+    }
+
+    public void saveFilmeResults(WrapperModel.FilmesModel filmesModel){
+
+        RoomDbInitializer.populateTestAsync(RoomDb.getAppDatabase(this));
+
     }
 
 

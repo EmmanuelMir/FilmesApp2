@@ -2,7 +2,9 @@ package com.emmanuelmir.filmesapp;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.Relation;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -123,11 +125,12 @@ public class WrapperModel {
             "results",
             "total_results",
             "total_pages"
-    })
+    })@Entity
     static class FilmesModel {
 
         @JsonProperty("page")
         private int page;
+        @Relation(parentColumn = "id", entityColumn = "total_results", entity = Result.class)
         @JsonProperty("results")
         private List<WrapperModel.FilmesModel.Result> results = null;
         @JsonProperty("total_results")
@@ -215,7 +218,7 @@ public class WrapperModel {
                 "video",
                 "vote_average"
         })
-        @Entity(tableName = "filme")
+        @Entity
         static class Result {
 
             @ColumnInfo(name = "poster_path")
@@ -234,6 +237,7 @@ public class WrapperModel {
             @JsonProperty("release_date")
             private String releaseDate;
 
+            @Ignore
             @ColumnInfo(name = "genre_ids")
             @JsonProperty("genre_ids")
             private List<Integer> genreIds = null;
@@ -242,7 +246,7 @@ public class WrapperModel {
             @PrimaryKey
             private int id;
 
-            @ColumnInfo(name = "genre_ids")
+            @ColumnInfo(name = "original_title")
             @JsonProperty("original_title")
             private String originalTitle;
 
