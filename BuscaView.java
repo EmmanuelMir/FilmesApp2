@@ -1,32 +1,25 @@
 package com.emmanuelmir.filmesapp;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.Serializable;
-
 
 public class BuscaView extends WrapperView{
+    private GestureDetectorCompat mDetector;
     private RecyclerView mRecyclerView;
     private WrapperController mWrapperController;
     private LinearLayoutManager layoutManager;  //layoutManager do RecyclerView
@@ -57,21 +50,21 @@ public class BuscaView extends WrapperView{
 
         mRecyclerView.setHasFixedSize(true);
 
-        mWrapperController = new WrapperController();
+        mWrapperController = new WrapperController(this);
 
         mRecyclerView.setAdapter(mWrapperController);
 
         filmesModel = BusGlobal.getBus().getStickyEvent(WrapperModel.FilmesModel.class);
 
+        BusGlobal.getBus().removeAllStickyEvents();
+
         showProgressBar();
 
-        mWrapperController.setmFilmeData(filmesModel);
+        startBuscaFilmesAsync2(1);
 
-        dialogShow("teste",mWrapperController.getmFilmeData().getResults().get(0).getTitle().toString());
+        //mWrapperController.publishResults(buscaTitulo, filmesModel);
 
-        mWrapperController.publishResults(buscaTitulo);
-
-        hideProgressBar();
+        //mWrapperController.publishResults(buscaTitulo);
 
     }
 
@@ -89,7 +82,7 @@ public class BuscaView extends WrapperView{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_filmes_view, menu);
+        getMenuInflater().inflate(R.menu.menu_busca, menu);
         return true;
     }
 
@@ -101,24 +94,25 @@ public class BuscaView extends WrapperView{
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.refresh_movies) {
+        if (id == R.id.proxima) {
             if(mBuscaTask!=null) {
                 stopBuscaFilmesAsync2();
             }
-            startBuscaFilmesAsync2(1);
+            int i = mWrapperController.getmFilmeData().getPage()+1;
+            startBuscaFilmesAsync2(i);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Subscribe
+    /*@Subscribe
     public void setFilmesData(WrapperModel.FilmesModel event){
         // your implementation
         WrapperModel.FilmesModel filmesModel = event;
         //mWrapperController.setmFilmeData(filmesModel);
         //mWrapperController.publishResults(buscaTitulo);
 
-    }
+    }*/
 
     public void startBuscaFilmesAsync2(int i) {
         mBuscaTask = (BuscaView.HttpRequestTask) new BuscaView.HttpRequestTask().execute(i);
@@ -165,9 +159,9 @@ public class BuscaView extends WrapperView{
             hideProgressBar();
             if (mFilmesModel != null) {
                 //dialogShow("teste", "" + mFilmesModel.getResults());
-                mWrapperController.setmFilmeData(mFilmesModel);
+                dialogShow("buscaTitulo", "" + buscaTitulo);
+                mWrapperController.publishResults(buscaTitulo, mFilmesModel);
                 //TODO implementar o filtro na atualização de páginas.
-                //mWrapperController.publishResults(buscaTitulo);
             } else {
                 try {
                     dialogShow("Aviso!", "Alguma coisa deu errado!");

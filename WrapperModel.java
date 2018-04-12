@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WrapperModel {
@@ -151,7 +152,7 @@ public class WrapperModel {
         public FilmesModel(int page, List<WrapperModel.FilmesModel.Result> results, int totalResults, int totalPages) {
             super();
             this.page = page;
-            this.results = results;
+            this.results = new ArrayList(results);
             this.totalResults = totalResults;
             this.totalPages = totalPages;
         }

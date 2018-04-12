@@ -18,12 +18,11 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
-
-import java.io.Serializable;
 
 
 
@@ -41,7 +40,7 @@ import java.io.Serializable;
     //TODO 03 - Está na classe MODEL
     //TODO 04 - Realizar imports para o GRADLE das bibliotecas necessárias
 
-public class WrapperView extends AppCompatActivity {
+public class WrapperView extends AppCompatActivity implements WrapperController.FilmesAdapterOnClickHandler{
 
     private RecyclerView mRecyclerView;
     private WrapperController mWrapperController;
@@ -71,7 +70,7 @@ public class WrapperView extends AppCompatActivity {
 
         mRecyclerView.setHasFixedSize(true);
 
-        mWrapperController = new WrapperController();
+        mWrapperController = new WrapperController(this);
 
         mRecyclerView.setAdapter(mWrapperController);
 
@@ -82,7 +81,7 @@ public class WrapperView extends AppCompatActivity {
         mCharTitulo = mSearchEdit.getText();
 
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-
+        //TODO Só dar start na Async se o banco estiver vazio
         startBuscaFilmesAsync(1);
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -95,6 +94,7 @@ public class WrapperView extends AppCompatActivity {
             }
         });
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -181,6 +181,9 @@ public class WrapperView extends AppCompatActivity {
 
 
     public void dialogShow(String titulo, String message){
+        if(mDialog!=null){
+            mDialog.cancel();
+        }
         AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
         mDialogBuilder.setTitle(titulo);
         mDialogBuilder.setMessage(message);
@@ -227,4 +230,22 @@ public class WrapperView extends AppCompatActivity {
         mInt.putExtra("title", mCharTitulo);
         WrapperView.this.startActivity(mInt);
     }
+
+    /**
+     * Onclick handling para
+     * @param filmeDetails
+     */
+    @Override
+    public void onClick(WrapperModel.FilmesModel.Result filmeDetails) {
+        Context context = this;
+        startDetailsView(filmeDetails);
+    }
+
+    public void startDetailsView(WrapperModel.FilmesModel.Result filmeDetails){
+        BusGlobal.getBus().postSticky(filmeDetails);
+        Intent mInt = new Intent(WrapperView.this, DetailsView.class);
+        WrapperView.this.startActivity(mInt);
+    }
+
+
 }
