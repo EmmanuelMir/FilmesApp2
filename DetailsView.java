@@ -3,6 +3,7 @@ package com.emmanuelmir.filmesapp;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -15,28 +16,36 @@ public class DetailsView extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details_view);
-        BusGlobal.getBus().getStickyEvent(WrapperModel.FilmesModel.Result.class);
+        WrapperModel.FilmesModel.Result details = BusGlobal.getBus().getStickyEvent(WrapperModel.FilmesModel.Result.class);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ActionBar mActionBar = getSupportActionBar();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        LinearLayout ll = (LinearLayout) findViewById(R.id.linearLayout1);
+        LinearLayout ll = findViewById(R.id.my_linear_layout);
 
-        TextView tv = new TextView(this);
-        tv.setText("testView");
-        tv.setLayoutParams(new TextView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        ll.addView(tv);
-        for(int i = 0; i<14; i++){
+        createTvChildViews(ll, details, mActionBar);
 
+    }
+
+    public void createTvChildViews(LinearLayout ll, WrapperModel.FilmesModel.Result details, ActionBar mActionBar){
+        mActionBar.setTitle(details.getTitle());
+        TextView tv;
+        View v;
+        String[] titDetails = {"Titulo: ", "Titulo Original: ", "Popularidade: ",
+                "Contagem de Votos: ", "Média de Votos: ", "Idioma: ", "Data de Lançamento", "Sinopse(US): "};
+        String[] detailsContent = {details.getTitle(), details.getOriginalTitle(), ""+details.getPopularity(), ""+details.getVoteCount(),
+                ""+details.getVoteAverage(), details.getOriginalLanguage(), details.getReleaseDate(), details.getOverview()};
+        for(int i = 0; i<8; i++){
+            tv = new TextView(this);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(20,15,20,15);
+            tv.setLayoutParams(layoutParams);
+
+            tv.setText(titDetails[i] + detailsContent[i]);
+            ll.addView(tv);
         }
     }
 }
