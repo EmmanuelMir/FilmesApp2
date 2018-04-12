@@ -10,6 +10,9 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+/**
+ * Classe dos detalhes dos filmes.
+ */
 public class DetailsView extends AppCompatActivity {
 
     @Override
