@@ -158,13 +158,13 @@ public class BuscaView extends WrapperView{
             //showApiKeyData();
             hideProgressBar();
             if (mFilmesModel != null) {
-                //dialogShow("teste", "" + mFilmesModel.getResults());
-                dialogShow("buscaTitulo", "" + buscaTitulo);
+                //dialogShow("buscaTitulo", "" + buscaTitulo);
                 mWrapperController.publishResults(buscaTitulo, mFilmesModel);
                 //TODO implementar o filtro na atualização de páginas.
             } else {
                 try {
-                    dialogShow("Aviso!", "Alguma coisa deu errado!");
+                    mWrapperController.publishResults(buscaTitulo,filmesModel);
+                    dialogShow("Aviso!", "Filmes offline somente com nota maior que 5.");
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
@@ -175,13 +175,21 @@ public class BuscaView extends WrapperView{
     }
 
     public void dialogShow(String titulo, String message){
-        AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
-        mDialogBuilder.setTitle(titulo);
-        mDialogBuilder.setMessage(message);
-        mDialogBuilder.setPositiveButton("OK", null);
-        mDialogBuilder.setNegativeButton("Cancel", null);
-        mDialog = mDialogBuilder.create();
-        mDialog.show();
+        if(mDialog!=null){
+            mDialog.setTitle(titulo);
+            mDialog.setMessage(message);
+        }else {
+            AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
+            mDialogBuilder.setTitle(titulo);
+            mDialogBuilder.setMessage(message);
+            mDialogBuilder.setPositiveButton("OK", null);
+            mDialogBuilder.setNegativeButton("Cancel", null);
+            mDialog = mDialogBuilder.create();
+            mDialog.show();
+        }
+    }
+    public void dialogCancel(){
+        mDialog.cancel();
     }
 
     @Override

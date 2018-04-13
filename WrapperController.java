@@ -76,13 +76,13 @@ public class WrapperController extends RecyclerView.Adapter<WrapperController.Fi
             if(c == WrapperView.class&&(mFilmeData.getPage()+1)<mFilmeData.getTotalPages()) {
                 WrapperView mA = (WrapperView) holder.itemView.getContext();
                 mA.startBuscaFilmesAsync(i);
-                mA.dialogShow("Página", ""+ i +"\nPáginas Totais: "+ mFilmeData.getTotalPages());
+                //mA.dialogShow("Página", ""+ i +"\nPáginas Totais: "+ mFilmeData.getTotalPages());
                 mFilmeData.setPage(i);
             }
             if(c == BuscaView.class&&(mFilmeData.getPage()+1)<mFilmeData.getTotalPages()){
                 BuscaView mB =(BuscaView) holder.itemView.getContext();
                 mB.startBuscaFilmesAsync2(i);
-                mB.dialogShow("Página", ""+ i +"\nPáginas Totais: "+ mFilmeData.getTotalPages());
+                //mB.dialogShow("Página", ""+ i +"\nPáginas Totais: "+ mFilmeData.getTotalPages());
                 mFilmeData.setPage(i);
             }
         }
