@@ -10,8 +10,8 @@ public class RoomDbInitializer {
 
     private static final String TAG = RoomDbInitializer.class.getName();
 
-    public static void populateAsync(@NonNull final RoomDb db, WrapperModel.FilmesModel.Result realResult) {
-        PopulateDbAsync task = new PopulateDbAsync(db);
+    public static void populateAsync(@NonNull final RoomDb db, WrapperModel.FilmesModel filmesModels) {
+        PopulateDbAsync task = new PopulateDbAsync(db,filmesModels);
         task.execute();
     }
 
@@ -48,9 +48,11 @@ public class RoomDbInitializer {
     private static class PopulateDbAsync extends AsyncTask<WrapperModel.FilmesModel, Void, Void> {
 
         private final RoomDb mDb;
+        private final WrapperModel.FilmesModel afilmesModel;
 
-        PopulateDbAsync(RoomDb db) {
+        PopulateDbAsync(RoomDb db, WrapperModel.FilmesModel filmesModel) {
             mDb = db;
+            this.afilmesModel = filmesModel;
         }
 
         @Override

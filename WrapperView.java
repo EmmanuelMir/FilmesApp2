@@ -255,7 +255,7 @@ public class WrapperView extends AppCompatActivity implements WrapperController.
 
     public void saveFilmeResults(WrapperModel.FilmesModel filmesModel){
 
-        RoomDbInitializer.populateTestAsync(RoomDb.getAppDatabase(this));
+        RoomDbInitializer.populateAsync(RoomDb.getAppDatabase(this), filmesModel.getResults());
 
     }
 
