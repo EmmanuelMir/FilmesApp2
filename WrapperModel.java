@@ -130,11 +130,15 @@ public class WrapperModel {
 
         @JsonProperty("page")
         private int page;
-        @Relation(parentColumn = "id", entityColumn = "total_results", entity = Result.class)
+
+        @Ignore
         @JsonProperty("results")
         private List<WrapperModel.FilmesModel.Result> results = null;
+
+        @PrimaryKey
         @JsonProperty("total_results")
         private int totalResults;
+
         @JsonProperty("total_pages")
         private int totalPages;
 
@@ -221,60 +225,60 @@ public class WrapperModel {
         @Entity
         static class Result {
 
-            @ColumnInfo(name = "poster_path")
+            //@ColumnInfo(name = "posterPath")
             @JsonProperty("poster_path")
             private String posterPath;
 
-            @ColumnInfo(name = "adult")
+            //@ColumnInfo(name = "adult")
             @JsonProperty("adult")
             private boolean adult;
 
-            @ColumnInfo(name = "overview")
+            //@ColumnInfo(name = "overview")
             @JsonProperty("overview")
             private String overview;
 
-            @ColumnInfo(name = "release_date")
+            //@ColumnInfo(name = "release_date")
             @JsonProperty("release_date")
             private String releaseDate;
 
             @Ignore
-            @ColumnInfo(name = "genre_ids")
+            //@ColumnInfo(name = "genre_ids")
             @JsonProperty("genre_ids")
             private List<Integer> genreIds = null;
 
             @JsonProperty("id")
-            @PrimaryKey
+            @PrimaryKey (autoGenerate = true)
             private int id;
 
-            @ColumnInfo(name = "original_title")
+            //@ColumnInfo(name = "original_title")
             @JsonProperty("original_title")
             private String originalTitle;
 
-            @ColumnInfo(name = "original_language")
+            //@ColumnInfo(name = "original_language")
             @JsonProperty("original_language")
             private String originalLanguage;
 
-            @ColumnInfo(name = "title")
+            //@ColumnInfo(name = "title")
             @JsonProperty("title")
             private String title;
 
-            @ColumnInfo(name = "backdrop_path")
+            //@ColumnInfo(name = "backdrop_path")
             @JsonProperty("backdrop_path")
             private String backdropPath;
 
-            @ColumnInfo(name = "popularity")
+            //@ColumnInfo(name = "popularity")
             @JsonProperty("popularity")
             private float popularity;
 
-            @ColumnInfo(name = "vote_count")
+            //@ColumnInfo(name = "vote_count")
             @JsonProperty("vote_count")
             private int voteCount;
 
-            @ColumnInfo(name = "video")
+            //@ColumnInfo(name = "video")
             @JsonProperty("video")
             private boolean video;
 
-            @ColumnInfo(name = "vote_average")
+            //@ColumnInfo(name = "vote_average")
             @JsonProperty("vote_average")
             private float voteAverage;
 

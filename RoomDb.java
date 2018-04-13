@@ -22,7 +22,7 @@ public abstract class RoomDb extends RoomDatabase {
                     Room.databaseBuilder(context.getApplicationContext(), RoomDb.class, "filmes-database")
                             // allow queries on the main thread.
                             // Don't do this on a real app! See PersistenceBasicSample for an example.
-                            .allowMainThreadQueries()
+                            .allowMainThreadQueries().fallbackToDestructiveMigration()
                             .build();
         }
         return INSTANCE;

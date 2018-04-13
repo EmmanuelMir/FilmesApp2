@@ -84,7 +84,8 @@ public class WrapperView extends AppCompatActivity implements WrapperController.
 
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         //TODO Só dar start na Async se o banco estiver vazio
-        startBuscaFilmesAsync(1);
+        //startBuscaFilmesAsync(1);
+        carregaDataOfflineFirst();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -166,7 +167,7 @@ public class WrapperView extends AppCompatActivity implements WrapperController.
             hideProgressBar();
             if (mFilmesModel != null) {
                 //dialogShow("teste", "" + mFilmesModel.getResults());
-                mWrapperController.setmFilmeData(mFilmesModel);
+                atualizaBanco(mFilmesModel);
             }
             else {
                 try {
@@ -255,8 +256,34 @@ public class WrapperView extends AppCompatActivity implements WrapperController.
 
     public void saveFilmeResults(WrapperModel.FilmesModel filmesModel){
 
-        RoomDbInitializer.populateAsync(RoomDb.getAppDatabase(this), filmesModel.getResults());
+        RoomDbInitializer.populateAsync(RoomDb.getAppDatabase(this), filmesModel);
 
+    }
+
+    public boolean verificaBanco(){
+        //inicia o dbFilmesModel
+        WrapperModel.FilmesModel dFilmesModel = RoomDbInitializer.getFilmesModelBanco(RoomDb.getAppDatabase(this));
+        if(dFilmesModel==null) return false;
+        if(mWrapperController.getmFilmeData()!=null) return true;
+        mWrapperController.setmFilmeData(dFilmesModel);
+        return true;
+    }
+    public void carregaDataOfflineFirst(){
+        if(verificaBanco()){
+            int page = 1+(mWrapperController.getmFilmeData().getPage());
+            startBuscaFilmesAsync(page);
+        }else{
+            startBuscaFilmesAsync(1);
+        }
+    }
+
+    /**
+     * Método executado na AsyncTask para atualização do Banco e da RecyclerView
+     * @param mFilmesModel
+     */
+    public void atualizaBanco(WrapperModel.FilmesModel mFilmesModel){
+        saveFilmeResults(mFilmesModel);
+        mWrapperController.setmFilmeData(mFilmesModel);
     }
 
 
